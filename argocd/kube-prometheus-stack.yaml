@@ -6,15 +6,22 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/prometheus-community/kube-prometheus.git
-    targetRevision: "*"
-    path: manifests
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: '*'
     helm:
       valueFiles:
         - values.yaml
       values: |
         prometheus:
           enabled: true
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            annotations:
+              cert-manager.io/cluster-issuer: ca-issuer
+            hosts:
+              - prometheus.kind.cluste
           prometheusSpec:
             serviceMonitorSelectorNilUsesHelmValues: false
             serviceMonitorSelector: {}
@@ -22,6 +29,7 @@ spec:
           enabled: true
           adminPassword: "admin"
           ingress:
+            ingressClassName: nginx
             enabled: true
             path: /
             hosts:

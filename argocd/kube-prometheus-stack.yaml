@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/prometheus-community/kube-prometheus.git
+    targetRevision: "*"
+    path: manifests
+    helm:
+      valueFiles:
+        - values.yaml
+      values: |
+        prometheus:
+          enabled: true
+          prometheusSpec:
+            serviceMonitorSelectorNilUsesHelmValues: false
+            serviceMonitorSelector: {}
+        grafana:
+          enabled: true
+          adminPassword: "admin"
+          ingress:
+            enabled: true
+            path: /
+            hosts:
+              - grafana.kind.cluster
+        alertmanager:
+          enabled: true
+          alertmanagerSpec:
+            replicas: 3
+            externalUrl: "http://alertmanager.kind.cluster"
+        nodeExporter:
+          enabled: true
+        kubeStateMetrics:
+          enabled: true
+        prometheusOperator:
+          enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

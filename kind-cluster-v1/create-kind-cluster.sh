@@ -18,6 +18,15 @@ nodes:
 
 EOF
 
+for i in $(seq 1 $NUM_WORKERS); do
+  cat <<EOF >> cluster.yaml
+  - role: worker
+    extraMounts:
+      - hostPath: /home/test/Desktop/Learn/kind_k8s_cluster/KIND_STORAGE
+        containerPath: /mnt/storage
+EOF
+done
+
 
 # Create the Kubernetes cluster
 kind create cluster --name $CLUSTER_NAME --config cluster.yaml

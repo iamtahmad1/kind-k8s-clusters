@@ -335,7 +335,7 @@ fi
 
 cleanup
 network
-proxies
+#proxies
 root_ca
 install_ca
 cluster "$@"
